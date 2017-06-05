@@ -77,6 +77,48 @@ let children = function(n) {
     return matched;
 }
 
+//========================dom操作==================================
+//===================domManip=================================
+let buildFragment = function(elems, context) {
+    let fragment = context.createDocumentFragment(), // 好东西，不在dom树中，常用作文档碎片
+        nodes = [],
+        i = 0,
+        elem,
+        l = elems.length;
+
+    for ( ; i < l; i++) {
+        elem = elems[i];
+        // 创一个元素div作容器
+        tmp = fragment.appendChild(context.createElement('div'));
+        // 放到文档碎片中
+        tmp.innerHTML = elem;
+    }
+    return fragment;
+}
+
+// 将不同的输入统一处理
+let domManip = function(parentEles, target, callback) {
+    let l = parentEles.length;
+    let iNoClone = l - 1;
+
+    if (l) {
+        let fragment = buildFragment([target], parentEles[0].ownerDocument);
+        var first = fragment.firstChild;
+        if (fragment.childNodes.length === 1) {
+            fragment = first;
+        }
+        if (first) {
+            callback.call(parentEles, first);
+        }
+    }
+}
+
+let append = function([parentEles], target) {
+    // 第一个参数是arguments，类数组对象，target可能是字符串或dom元素
+    return domManip([parentEles], target, function(elem) {
+        parentEles.appendChild(elem);
+    });
+}
 </script>
 
 </html>

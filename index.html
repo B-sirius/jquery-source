@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+</head>
+
+<body>
+    
+</body>
+<script>
+//=============================遍历父元素====================
+// 获取直接父元素
+let parent = function(elem) {
+    let parent = elem.parentNode;
+    return parent && parent.nodeType !== 11 ? parent : null;
+}
+
+// 获取所有父元素
+let parents = function(elem) {
+    let matched = [];
+    while((elem = elem['parentNode']) && elem.nodeType !== 9) { // nodeType 9是document节点
+        if (elem.nodeType === 1) { // 1 是元素节点
+            matched.push(elem);
+        }
+    }  
+    return matched;
+}
+
+// 获取指定区间内的父元素
+let parentsUntil(elem, filter) {
+    let matched = [],
+        until,
+        truncate = filter !== undefined;
+
+    while ((elem = elem['parentNode']) && elem.nodeType !== 9) {
+        if (elem.nodeType === 1) {
+            if (truncate) {
+                if (elem.nodeName.toLowerCase() == filter) { // nodeName对于元素节点来说相当于tagName,如一个span节点会是'SPAN'
+                    break;
+                }
+            }
+            matched.push(elem);
+        }
+    }
+    return matched;
+}
+
+//=================================遍历兄弟元素===============================
+let sibling(cur, dir) {
+    while ((cur = cur[dir]) && cur.nodeType !== 1) {} // 如果不是元素节点，下一个
+    return cur;
+}
+
+// 下一个兄弟节点
+let next = function(elem) {
+    return sibling(elem, 'nextSibling');
+}
+
+// 上一个兄弟节点
+let prev = function(elem) {
+    return sibling(elem, 'previousSibling');
+}
+
+//=============================遍历后代===================================
+// children模拟，获得所有直接子元素
+let children = function(n) {
+    let n = n.firstChild;
+
+    let matched = [];
+    for (; n; n = n.nextSibling) { // 如果存在下一个兄弟节点
+        if (n.nodeType === 1) { // 是元素节点
+            matched.push(n);
+        }
+    }
+    return matched;
+}
+
+</script>
+
+</html>

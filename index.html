@@ -96,6 +96,18 @@ let buildFragment = function(elems, context) {
     return fragment;
 }
 
+// 关闭脚本执行
+let disableScript(elem) {
+    elem.type = (elem.getAttribute('type') !== null) + '/' + elem.type;
+    return elem;
+}
+
+// 还原脚本
+let restoreScript(elem) {
+    elem.removeAttribute('type');
+    return elem;
+}
+
 // 将不同的输入统一处理
 let domManip = function(parentEles, target, callback) {
     let l = parentEles.length;
@@ -103,10 +115,7 @@ let domManip = function(parentEles, target, callback) {
 
     if (l) {
         let fragment = buildFragment([target], parentEles[0].ownerDocument);
-        var first = fragment.firstChild;
-        if (fragment.childNodes.length === 1) {
-            fragment = first;
-        }
+        var first = fragment.firstChild.firstChild;
         if (first) {
             callback.call(parentEles, first);
         }

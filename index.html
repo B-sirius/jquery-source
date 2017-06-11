@@ -128,6 +128,97 @@ let append = function([parentEles], target) {
         parentEles.appendChild(elem);
     });
 }
+
+let html = function(value) {
+    let elem = this[0] || {},
+        i = 0,
+        l = this.length;
+    if (value === undefined && elem.nodeType === 1) {
+        return elem.innerHTML;
+    }
+    for ( ; i < l; i++) {
+        elem = this[i] || {};
+        if (elem.nodeType === 1) {
+            elem.innerHTML = value;
+        }
+    }
+}
+
+let getText = function(elem) {
+    let node,
+        ret = '',
+        i = 0,
+        nodeType = elem.nodeType;
+    if (!nodeType) {
+        // 如果没有节点类型，则是一个数组
+        while(node = elem[i++]) {
+            // 不遍历注释节点
+            ret += getText(node);
+        }  
+    } else if (nodeType === 1 || nodeType === 9 || nodeType === 11) {
+        if (typeof elem.textContent === 'string') {
+            return elem.textContent;
+        } else {
+            for (elem = elem.firstChild; elem; elem = elem.nextSibling) {
+                ret += getContext(elem);
+            }
+        }
+    } else if(nodeType === 3 || nodeType === 4) {
+        return elem.nodeValue;
+    }
+    return ret;
+}
+
+let empty = function() {
+    let elem, i = 0;
+    for ( ; (elem = this[i]) != null; i++) {
+        if (elem.nodeType === 1) {
+            elem.textContent = '';
+        }
+    }
+}
+
+let setText = function(value) {
+    empty.call(this);
+    if (this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9) {
+        this.textContent = value;
+    }
+}
+
+let text = function(value) {
+    return value === undefined ? getText(this) : setText.call(this.value);
+}
+
+//==============================样式获取==============================
+// 获取样式合集
+let getStyles(elem) {
+    // 在许多在线的演示代码中，getComputedStyle 是通过 document.defaultView 对象来调用的。
+    // 大部分情况下，这是不需要的， 因为可以直接通过window对象调用。
+    // 但有一种情况，你必需要使用 defaultView，那是在firefox3.6上访问子框架内的样式 (iframe)
+    return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+}
+
+// 交换样式，将样式交换为options中的样式，再调用回调，最后替换回原样式
+// 如display:none元素无法获得其宽高，可以利用此方法获得宽高
+let swap = function(elem, options, callback, args) {
+    let ret, name,
+        old = {};
+    for (name in options) {
+        old[name] = elem.style[name];
+        elem.style[name] = options[name];
+    }
+    ret = callback.apply(elem, args || []);
+    for (name in options) {
+        elem.style[name] = old[name];
+    }
+    return ret;
+}
+
+let curCSS(elem, name) {
+    let computed = getStyles(elem);
+    let ret = computed.getPropertyValue(name) || computed[name];
+    return ret;
+}
 </script>
 
 </html>

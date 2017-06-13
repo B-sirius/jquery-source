@@ -219,6 +219,80 @@ let curCSS(elem, name) {
     let ret = computed.getPropertyValue(name) || computed[name];
     return ret;
 }
+
+//==========================设置样式============================
+//分解参数
+let access = function(elems, fn, key, value, chainable, emptyGet, raw) {
+    let i = 0;
+    let len = elems.length;
+    // 如果是一个对象，for in 递归调用自己
+    if (typeof key === 'object') {
+        chainable = true;
+        for (i in key) {
+            access(elems, fn, i, key[i], true, emptyGet, raw);
+        }
+    } else if (value !== undefined) {
+        if (fn) {
+            fn(elems, key, value);
+        }
+    }
+    return elems;
+}
+
+// 设置样式
+let style = function(elem, name, value, extra) {
+    let origName = jQuery.camelCase(name);
+    let style = elem.style;
+    style[name] = value;
+}
+
+let css(name, value) {
+    return access(this, function(elem, name, value) {
+        return value !== undefined ? 
+            style(elem, name, value) : 
+            jQuery.css(elem, name);
+    }, name, value, arguments.length > 1);
+}
+
+// //===================绑定设计=====================
+// ajQuery.fn.on = function(types, fn) {
+//     // 参数过滤
+//     ajQuery.event.add(this[0], types, fn);
+// }
+
+// ajQuery.event = {
+//     add: function(elem, types, handler) {
+//         var eventHandle = function(e) {
+//             return ajQuery.event.dispatch.apply(elem, arguments);
+//         };
+//     },
+//     // 派发事件
+//     dispatch: function(event) {
+//         // 修正时间对象
+//         event = ajQuery.event.fix(event);
+//     },
+//     // 修正事件对象
+//     fix: function(event) {
+//         // 原始事件引用
+//         var originalEvent = event;
+//         // 鼠标时间对象的属性
+//         var props = "altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which button buttons clientX clientY offsetX offsetY pageX pageY screenX screenY toElement".split(' ');
+
+//         // 创建事件对象
+//         var event = new ajQuery.Event(originalEvent);
+//     }
+// }
+
+// ajQuery.Event = function(src, props) {
+//     if (src && src.type) {
+//         this.originalEvent = src;
+//         this.type = src.type;
+//         this.isDefaultPrevented = src.defaultPrevented || src.defaultPrevented === undefined && src.returnValue === false ? returnTrue : returnFalse;
+//     } else {
+//         this.type = src;
+//     }
+//     this.timeStamp = src
+// }
 </script>
 
 </html>
